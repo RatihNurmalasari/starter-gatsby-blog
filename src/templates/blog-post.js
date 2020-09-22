@@ -6,7 +6,35 @@ import Img from 'gatsby-image'
 import Layout from '../components/layout'
 
 import heroStyles from '../components/hero.module.css'
+import {
+  createInstance,
+  OptimizelyProvider,
+  OptimizelyFeature,
+  withOptimizely,
+} from '@optimizely/react-sdk';
 
+const optimizely = createInstance({
+  sdkKey: 'KQLqMLV5WzeVGeQPm8vf2',
+  datafileOptions: {
+    updateInterval: 1000,
+    autoUpdate: true,
+    urlTemplate: 'https://cdn.optimizely.com/datafiles/KQLqMLV5WzeVGeQPm8vf2.json',
+  }
+})
+
+function Button(props) {
+  function onClick(event) {
+    props.optimizely.track('Event_Clicks');
+  }
+
+  return (
+    <button onClick={onClick}>
+      Purchase
+    </button>
+  )
+}
+
+const WrappedButton = withOptimizely(Button)
 class BlogPostTemplate extends React.Component {
   render() {
     const post = get(this.props, 'data.contentfulBlogPost')
@@ -39,6 +67,18 @@ class BlogPostTemplate extends React.Component {
             />
           </div>
         </div>
+        <OptimizelyProvider
+            optimizely={optimizely}
+            user={{ id: Math.random().toString()}}
+          >
+            <OptimizelyFeature autoUpdate={true} feature="discount">
+              { (isEnabled, variables) => (
+                isEnabled
+                  ? <pre >{`[DEBUG: Feature ON] ${variables.amount}` } <WrappedButton /></pre>
+                  : <pre >{`[DEBUG: Feature OFF] Daily deal: A bluetooth speaker for $99!` } <WrappedButton /></pre>
+              )}
+            </OptimizelyFeature>
+        </OptimizelyProvider>
       </Layout>
     )
   }
