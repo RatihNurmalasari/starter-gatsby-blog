@@ -6,6 +6,7 @@ import Img from 'gatsby-image'
 import Layout from '../components/layout'
 
 import heroStyles from '../components/hero.module.css'
+import blogpostStyles from '../templates/blog-post.module.css'
 import {
   createInstance,
   OptimizelyProvider,
@@ -22,19 +23,33 @@ const optimizely = createInstance({
   }
 })
 
-function Button(props) {
+function ButtonVar1(props) {
   function onClick(event) {
     props.optimizely.track('Event_Clicks');
   }
 
   return (
-    <button onClick={onClick}>
+    <button onClick={onClick} style={{ height: '50px', width:'100%', background:"Red" }}>
       Purchase
     </button>
   )
 }
 
-const WrappedButton = withOptimizely(Button)
+function ButtonVar2(props) {
+  function onClick(event) {
+    props.optimizely.track('Event_Clicks');
+    alert("Thanks For Click")
+  }
+
+  return (
+    <button onClick={onClick} style={{ height: '50px', width:'100%', background:"Blue" }}>
+      Purchase
+    </button>
+  )
+}
+
+const WrappedButtonVar1 = withOptimizely(ButtonVar1)
+const WrappedButtonVar2 = withOptimizely(ButtonVar2)
 class BlogPostTemplate extends React.Component {
   render() {
     const post = get(this.props, 'data.contentfulBlogPost')
@@ -74,8 +89,8 @@ class BlogPostTemplate extends React.Component {
             <OptimizelyFeature autoUpdate={true} feature="discount">
               { (isEnabled, variables) => (
                 isEnabled
-                  ? <pre >{`[DEBUG: Feature ON] ${variables.amount}` } <WrappedButton /></pre>
-                  : <pre >{`[DEBUG: Feature OFF] Daily deal: A bluetooth speaker for $99!` } <WrappedButton /></pre>
+                  ? variables.amount == 6 ?<WrappedButtonVar1 /> :<WrappedButtonVar2 />
+                  : <pre >{`[DEBUG: Feature OFF] `}</pre>
               )}
             </OptimizelyFeature>
         </OptimizelyProvider>
