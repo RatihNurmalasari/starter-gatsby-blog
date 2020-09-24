@@ -4,10 +4,7 @@ import { Helmet } from 'react-helmet'
 import get from 'lodash/get'
 import Img from 'gatsby-image'
 import Layout from '../components/layout'
-
 import heroStyles from '../components/hero.module.css'
-import blogpostStyles from '../templates/blog-post.module.css'
-
 import {
   createInstance,
   OptimizelyProvider,
@@ -15,6 +12,7 @@ import {
   withOptimizely,
   OptimizelyExperiment,
 } from '@optimizely/react-sdk';
+import $ from 'jquery';
 
 const optimizely = createInstance({
   sdkKey: 'KQLqMLV5WzeVGeQPm8vf2',
@@ -26,17 +24,21 @@ const optimizely = createInstance({
 })
 
 function ButtonVar(props) {
+  if(!props.post.cartButton){
+    return (null);
+  }
   var IdEntities = props.post.cartButton.meta[props.variation];
-  var valueEntries = "";
-  var self = this;
-  var a = client.getEntry(IdEntities);
-  console.log("KOKOK = ",a)
+  client.getEntry(IdEntities).then((response) => {
+    // output the author name
+    var valueEntry = response.fields.cartButtonColorVariance;
+    $(".button-cta").css({"height":"50px", "width":"100%","background":valueEntry});
+  })
   function onClick(event) {
     props.optimizely.track('Event_Clicks');
   }
 
   return (
-    <button onClick={onClick} style={{ height: '50px', width:'100%', background:"Red" }}>
+    <button className="button-cta" onClick={onClick}>
       Purchase
     </button>
   )
@@ -46,19 +48,18 @@ function ButtonVar1(props) {
 }
 const WrappedButtonVar = withOptimizely(ButtonVar)
 var contentful = require('contentful');
-var client = contentful.createClient({
-  space: 'jvlr7xlhiu9o',
-  accessToken: 'GPJfuob009Z4A_sp76T1JmL5y2HLwbuPAXjStDjvuTU',
-  host:'preview.contentful.com'
-})
+var contentfulConfig = {
+  space: process.env.CONTENTFUL_SPACE_ID,
+  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN,
+  host: process.env.CONTENTFUL_HOST
+};
+var client = contentful.createClient(contentfulConfig)
 class BlogPostTemplate extends React.Component {
   render() {
     const post = get(this.props, 'data.contentfulBlogPost')
     const siteTitle = get(this.props, 'data.site.siteMetadata.title')
     return (
       <Layout location={this.props.location}>
-
-        <p>${post.cartButton.meta['variation_2']}</p>
         <div style={{ background: '#fff' }}>
           <Helmet title={`${post.title} | ${siteTitle}`} />
           <div className={heroStyles.hero}>
