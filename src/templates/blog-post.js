@@ -7,11 +7,13 @@ import Layout from '../components/layout'
 
 import heroStyles from '../components/hero.module.css'
 import blogpostStyles from '../templates/blog-post.module.css'
+
 import {
   createInstance,
   OptimizelyProvider,
   OptimizelyFeature,
   withOptimizely,
+  OptimizelyExperiment,
 } from '@optimizely/react-sdk';
 
 const optimizely = createInstance({
@@ -23,7 +25,12 @@ const optimizely = createInstance({
   }
 })
 
-function ButtonVar1(props) {
+function ButtonVar(props) {
+  var IdEntities = props.post.cartButton.meta[props.variation];
+  var valueEntries = "";
+  var self = this;
+  var a = client.getEntry(IdEntities);
+  console.log("KOKOK = ",a)
   function onClick(event) {
     props.optimizely.track('Event_Clicks');
   }
@@ -34,29 +41,24 @@ function ButtonVar1(props) {
     </button>
   )
 }
+function ButtonVar1(props) {
 
-function ButtonVar2(props) {
-  function onClick(event) {
-    props.optimizely.track('Event_Clicks');
-    alert("Thanks For Click")
-  }
-
-  return (
-    <button onClick={onClick} style={{ height: '50px', width:'100%', background:"Blue" }}>
-      Purchase
-    </button>
-  )
 }
-
-const WrappedButtonVar1 = withOptimizely(ButtonVar1)
-const WrappedButtonVar2 = withOptimizely(ButtonVar2)
+const WrappedButtonVar = withOptimizely(ButtonVar)
+var contentful = require('contentful');
+var client = contentful.createClient({
+  space: 'jvlr7xlhiu9o',
+  accessToken: 'GPJfuob009Z4A_sp76T1JmL5y2HLwbuPAXjStDjvuTU',
+  host:'preview.contentful.com'
+})
 class BlogPostTemplate extends React.Component {
   render() {
     const post = get(this.props, 'data.contentfulBlogPost')
     const siteTitle = get(this.props, 'data.site.siteMetadata.title')
-
     return (
       <Layout location={this.props.location}>
+
+        <p>${post.cartButton.meta['variation_2']}</p>
         <div style={{ background: '#fff' }}>
           <Helmet title={`${post.title} | ${siteTitle}`} />
           <div className={heroStyles.hero}>
@@ -86,13 +88,9 @@ class BlogPostTemplate extends React.Component {
             optimizely={optimizely}
             user={{ id: Math.random().toString()}}
           >
-            <OptimizelyFeature autoUpdate={true} feature="discount">
-              { (isEnabled, variables) => (
-                isEnabled
-                  ? variables.amount == 6 ?<WrappedButtonVar1 /> :<WrappedButtonVar2 />
-                  : <pre >{`[DEBUG: Feature OFF] `}</pre>
-              )}
-            </OptimizelyFeature>
+            <OptimizelyExperiment experiment="discount_test">
+              {variation => <WrappedButtonVar variation={variation} post={post}/>}
+            </OptimizelyExperiment>
         </OptimizelyProvider>
       </Layout>
     )
@@ -115,6 +113,15 @@ export const pageQuery = graphql`
         childMarkdownRemark {
           html
         }
+      }
+      cartButton {
+        experimentTitle
+        experimentId
+        meta {
+          variation_1
+          variation_2
+        }
+        experimentKey
       }
     }
   }
