@@ -43,9 +43,7 @@ function ButtonVar(props) {
     </button>
   )
 }
-function ButtonVar1(props) {
 
-}
 const WrappedButtonVar = withOptimizely(ButtonVar)
 var contentful = require('contentful');
 var contentfulConfig = {
