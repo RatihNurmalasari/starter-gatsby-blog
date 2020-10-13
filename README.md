@@ -1,4 +1,4 @@
-# Contentful Gatsby Starter Blog
+# Contentful Gatsby Starter Blog test pull requesr
 
 Create a [Gatsby](http://gatsbyjs.com/) blog powered by [Contentful](https://www.contentful.com). This is a simplified version of the [Gatsby Contentful Starter](https://github.com/contentful-userland/gatsby-contentful-starter) which is maintained by our Community.
 
@@ -63,5 +63,3 @@ Feel free to open pull requests to fix bugs. If you want to add features, please
 
 You can learn more about how Contentful userland is organized by visiting [our about repository](https://github.com/contentful-userland/about).
 
-
-test pull request
