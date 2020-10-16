@@ -12,6 +12,7 @@ pipeline {
                 }
             }
             steps {
+                // checkout branch from pull request branch
                 echo 'This is Pull Request'
                 checkout([$class: 'GitSCM', branches: [[name: env.ghprbSourceBranch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1cd34eb4-1797-493e-b346-050bbfd59fcd', url: 'https://github.com/RatihNurmalasari/starter-gatsby-blog/']]])
                 echo "Pull Request Branch from $ghprbSourceBranch"
